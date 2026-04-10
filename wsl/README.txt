@@ -14,10 +14,10 @@ sudo apt update
 sudo apt install python3 python3-pip nmap openssh-server net-tools -y
 
 3. Scan WSL localhost:
-python3 advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024 --output results/wsl_localhost.json
+python3 advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024 --output results/wsl_localhost.json --csv-output results/wsl_localhost.csv
 
 4. Scan Windows from WSL:
-python3 advanced_port_scanner.py <windows-ip> --start 1 --end 1024 --output results/windows_from_wsl.json
+python3 advanced_port_scanner.py <windows-ip> --start 1 --end 1024 --output results/windows_from_wsl.json --csv-output results/windows_from_wsl.csv
 
 5. Start SSH in WSL:
 sudo service ssh start
@@ -30,6 +30,10 @@ python3 advanced_port_scanner.py <target-ip> --start 20 --end 100 --timeout 2
 
 8. Compare with Nmap:
 nmap -sV <target-ip>
+
+Useful options:
+- `--csv-output results/file.csv` saves a spreadsheet-friendly copy.
+- `--no-color` disables ANSI color if your terminal renders it poorly.
 
 Suggested workflow:
 - Run the scanner against 127.0.0.1 in WSL.
