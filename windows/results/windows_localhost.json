@@ -1,0 +1,25 @@
+{
+    "target": "127.0.0.1",
+    "resolved_ip": "127.0.0.1",
+    "scan_time": "2026-04-10T18:17:26.822072",
+    "open_ports": [
+        {
+            "port": 22,
+            "state": "open",
+            "service": "SSH",
+            "banner": "SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.15"
+        },
+        {
+            "port": 135,
+            "state": "open",
+            "service": "MSRPC",
+            "banner": "Not available"
+        },
+        {
+            "port": 445,
+            "state": "open",
+            "service": "SMB",
+            "banner": "Not available"
+        }
+    ]
+}

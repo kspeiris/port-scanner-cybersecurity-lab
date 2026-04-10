@@ -1,0 +1,13 @@
+{
+    "target": "172.23.180.180",
+    "resolved_ip": "172.23.180.180",
+    "scan_time": "2026-04-10T18:21:33.502294",
+    "open_ports": [
+        {
+            "port": 22,
+            "state": "open",
+            "service": "SSH",
+            "banner": "SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.15"
+        }
+    ]
+}
