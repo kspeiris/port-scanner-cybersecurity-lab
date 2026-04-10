@@ -1,7 +1,10 @@
 import argparse
 import concurrent.futures
+import csv
 import json
+import os
 import socket
+import sys
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -47,6 +50,29 @@ COMMON_PORTS = {
 }
 
 
+def supports_color() -> bool:
+    return sys.stdout.isatty() and os.getenv("TERM") not in (None, "dumb")
+
+
+def colorize(text: str, color: str, enabled: bool) -> str:
+    if not enabled:
+        return text
+
+    colors = {
+        "green": "\033[92m",
+        "cyan": "\033[96m",
+        "yellow": "\033[93m",
+        "red": "\033[91m",
+        "reset": "\033[0m",
+    }
+    return f"{colors[color]}{text}{colors['reset']}"
+
+
+def validate_port(value: int, label: str) -> None:
+    if not 1 <= value <= 65535:
+        raise ValueError(f"{label} port must be between 1 and 65535.")
+
+
 def resolve_target(target: str) -> str:
     try:
         return socket.gethostbyname(target)
@@ -83,6 +109,12 @@ def grab_banner(host: str, port: int, timeout: float = 2.0) -> Optional[str]:
         return None
 
     return None
+
+
+def prepare_output_path(filename: str) -> None:
+    directory = os.path.dirname(filename)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
 
 
 def scan_port(host: str, port: int, timeout: float = 1.0) -> Optional[Dict]:
@@ -131,6 +163,7 @@ def scan_host(
 
 
 def save_results(filename: str, target: str, ip: str, results: List[Dict]) -> None:
+    prepare_output_path(filename)
     output = {
         "target": target,
         "resolved_ip": ip,
@@ -142,20 +175,45 @@ def save_results(filename: str, target: str, ip: str, results: List[Dict]) -> No
         json.dump(output, file_handle, indent=4)
 
 
-def print_results(target: str, ip: str, results: List[Dict]) -> None:
+def save_csv_results(filename: str, target: str, ip: str, results: List[Dict]) -> None:
+    prepare_output_path(filename)
+    with open(filename, "w", newline="", encoding="utf-8") as file_handle:
+        writer = csv.DictWriter(
+            file_handle,
+            fieldnames=["target", "resolved_ip", "port", "state", "service", "banner"],
+        )
+        writer.writeheader()
+        for result in results:
+            writer.writerow(
+                {
+                    "target": target,
+                    "resolved_ip": ip,
+                    "port": result["port"],
+                    "state": result["state"],
+                    "service": result["service"],
+                    "banner": result["banner"],
+                }
+            )
+
+
+def print_results(target: str, ip: str, results: List[Dict], use_color: bool) -> None:
     print("\n" + "=" * 72)
-    print(f"Scan Results for: {target} ({ip})")
+    print(
+        f"Scan Results for: {colorize(target, 'cyan', use_color)} "
+        f"({colorize(ip, 'yellow', use_color)})"
+    )
     print("=" * 72)
     print(f"{'PORT':<10}{'STATE':<10}{'SERVICE':<20}{'BANNER'}")
     print("-" * 72)
 
     if not results:
-        print("No open ports found.")
+        print(colorize("No open ports found.", "red", use_color))
         return
 
     for item in results:
+        state = colorize(item["state"], "green", use_color)
         print(
-            f"{item['port']:<10}{item['state']:<10}{item['service']:<20}{item['banner']}"
+            f"{item['port']:<10}{state:<19}{item['service']:<20}{item['banner']}"
         )
 
 
@@ -171,8 +229,26 @@ def main() -> None:
         "--timeout", type=float, default=1.0, help="Socket timeout in seconds"
     )
     parser.add_argument("--output", help="Save results to JSON file")
+    parser.add_argument("--csv-output", help="Save results to CSV file")
+    parser.add_argument(
+        "--no-color", action="store_true", help="Disable ANSI color output"
+    )
 
     args = parser.parse_args()
+    use_color = supports_color() and not args.no_color
+
+    try:
+        validate_port(args.start, "Start")
+        validate_port(args.end, "End")
+        if args.start > args.end:
+            raise ValueError("Start port cannot be greater than end port.")
+        if args.threads < 1:
+            raise ValueError("Threads must be at least 1.")
+        if args.timeout <= 0:
+            raise ValueError("Timeout must be greater than 0.")
+    except ValueError as exc:
+        print(exc)
+        return
 
     try:
         ip = resolve_target(args.target)
@@ -190,12 +266,16 @@ def main() -> None:
     results = scan_host(ip, args.start, args.end, args.threads, args.timeout)
     end_time = datetime.now()
 
-    print_results(args.target, ip, results)
+    print_results(args.target, ip, results, use_color)
+    print(f"\n[*] Open ports found: {len(results)}")
     print(f"\n[*] Scan duration: {end_time - start_time}")
 
     if args.output:
         save_results(args.output, args.target, ip, results)
         print(f"[+] Results saved to {args.output}")
+    if args.csv_output:
+        save_csv_results(args.csv_output, args.target, ip, results)
+        print(f"[+] CSV results saved to {args.csv_output}")
 
 
 if __name__ == "__main__":

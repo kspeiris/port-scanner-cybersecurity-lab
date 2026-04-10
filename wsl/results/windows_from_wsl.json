@@ -1,0 +1,19 @@
+{
+    "target": "172.23.176.1",
+    "resolved_ip": "172.23.176.1",
+    "scan_time": "2026-04-10T18:20:34.524695",
+    "open_ports": [
+        {
+            "port": 135,
+            "state": "open",
+            "service": "MSRPC",
+            "banner": "Not available"
+        },
+        {
+            "port": 445,
+            "state": "open",
+            "service": "SMB",
+            "banner": "Not available"
+        }
+    ]
+}
