@@ -1,78 +1,247 @@
-# Advanced Port Scanner Cybersecurity Lab
+# Advanced TCP Port Scanner with Banner Grabbing
 
-This repo is set up for a safe Windows + WSL networking lab using a Python TCP port scanner with basic banner grabbing.
+A Python-based TCP port scanner that detects open ports, identifies common services, and performs basic banner grabbing.
 
-Use it only on systems you own or are explicitly authorized to test.
+Built and tested in a Windows + WSL (Ubuntu 24.04.4 LTS) environment.
 
-## Project Layout
-
-- `windows/advanced_port_scanner.py`: scanner for running from Windows terminals
-- `wsl/advanced_port_scanner.py`: scanner for running inside WSL
-- `windows/results/`: suggested JSON and CSV output folder for Windows-side runs
-- `wsl/results/`: suggested JSON and CSV output folder for WSL-side runs
+---
 
 ## Features
 
-- TCP connect scan
-- Common service name lookup
-- Basic banner grabbing for selected services
-- JSON export
-- CSV export with `--csv-output`
-- Optional ANSI colors with `--no-color` to disable
-- Automatic output directory creation
+- TCP port scanning
+- Service identification based on common ports
+- Basic banner grabbing
+- Multithreaded scanning for speed
+- JSON output support
+- CSV output support
+- Works across Windows and WSL
 
-## Quick Start
+---
 
-### Windows
+## Environment
 
-Run from the `windows/` folder:
+- Host: Windows with WSL enabled
+- WSL: Ubuntu 24.04.4 LTS
+- Language: Python 3
+- Editor: VS Code
 
-```bash
-python advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024 --output results/windows_localhost.json --csv-output results/windows_localhost.csv
-```
+---
 
-### WSL
+## Network Setup
 
-Run from the `wsl/` folder:
+| Component | IP Address |
+| --- | --- |
+| Windows (WSL-side) | 172.23.176.1 |
+| WSL Instance | 172.23.180.180 |
 
-```bash
-python3 advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024 --output results/wsl_localhost.json --csv-output results/wsl_localhost.csv
-```
+---
 
-## Suggested Lab Flow
+## Installation
 
-1. Scan Windows localhost.
-2. Scan WSL localhost.
-3. Scan Windows from WSL.
-4. Scan WSL from Windows.
-5. Start `ssh` in WSL and rescan port `22`.
-6. Start `python3 -m http.server 8000` in WSL and rescan around port `8000`.
-7. Optionally start `python -m http.server 8080` on Windows and scan it from WSL.
-8. Compare your findings with `nmap -sV`.
-
-## Example Commands
-
-### Windows scans WSL
+### 1. Clone or download the project
 
 ```bash
-python advanced_port_scanner.py <wsl-ip> --start 1 --end 1024 --output results/wsl_from_windows.json --csv-output results/wsl_from_windows.csv
+git clone <your-repo-url>
+cd port-scanner-cybersecurity-lab
 ```
 
-### WSL scans Windows
+### 2. Install dependencies in WSL
 
 ```bash
-python3 advanced_port_scanner.py <windows-ip> --start 1 --end 1024 --output results/windows_from_wsl.json --csv-output results/windows_from_wsl.csv
+sudo apt update
+sudo apt install python3 python3-pip nmap openssh-server net-tools -y
 ```
 
-### Narrow scan with longer timeout
+### 3. Run the scanner
+
+From the `windows/` folder:
+
+```powershell
+python advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024
+```
+
+From the `wsl/` folder:
 
 ```bash
-python3 advanced_port_scanner.py <target-ip> --start 20 --end 100 --timeout 2
+python3 advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024
 ```
 
-## Notes
+If Windows `python` opens the Microsoft Store alias, use:
 
-- `python` is usually correct on Windows and `python3` is usually correct in WSL.
-- Some open services will not return a banner.
-- WSL IP addresses may change after restarts.
-- Windows Firewall may affect cross-environment scans.
+```powershell
+& "C:\Users\kavin\AppData\Local\Programs\Python\Python313\python.exe" .\windows\advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024
+```
+
+---
+
+## Usage Examples
+
+### Scan localhost
+
+Windows:
+
+```powershell
+python advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024
+```
+
+WSL:
+
+```bash
+python3 advanced_port_scanner.py 127.0.0.1 --start 1 --end 1024
+```
+
+### Scan Windows from WSL
+
+```bash
+python3 advanced_port_scanner.py 172.23.176.1 --start 1 --end 1024
+```
+
+### Scan WSL from Windows
+
+```powershell
+& "C:\Users\kavin\AppData\Local\Programs\Python\Python313\python.exe" .\windows\advanced_port_scanner.py 172.23.180.180 --start 1 --end 1024
+```
+
+### Save results to file
+
+```powershell
+python advanced_port_scanner.py 127.0.0.1 --output results/windows_localhost.json --csv-output results/windows_localhost.csv
+```
+
+---
+
+## Sample Results
+
+### WSL Localhost Scan
+
+```text
+PORT   STATE   SERVICE   BANNER
+22     open    SSH       SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.15
+```
+
+![Localhost Scan](screenshots/Screenshot%206.png)
+
+### WSL to Windows Scan
+
+```text
+PORT   STATE   SERVICE   BANNER
+135    open    MSRPC     Not available
+445    open    SMB       Not available
+```
+
+![WSL to Windows](screenshots/wsl_to_windows.png)
+
+### HTTP Server Test
+
+Attempted to run:
+
+```bash
+python3 -m http.server 8000
+```
+
+Error:
+
+```text
+OSError: [Errno 98] Address already in use
+```
+
+![HTTP Error](screenshots/Screenshot%205.png)
+
+---
+
+## How It Works
+
+### 1. Port Scanning
+
+Uses TCP `connect_ex()` to check whether a port is open.
+
+### 2. Service Detection
+
+Maps common ports to likely services, for example:
+
+- 22 -> SSH
+- 80 -> HTTP
+- 445 -> SMB
+
+### 3. Banner Grabbing
+
+- Connects to open ports
+- Reads service response when available
+- Example:
+
+```text
+SSH-2.0-OpenSSH_9.6p1
+```
+
+---
+
+## Lab Observations
+
+- SSH service was successfully detected with a readable banner
+- Windows exposed system services on port 135 and port 445
+- Banner grabbing worked for SSH but not for all protocols
+- WSL showed limited exposure because of NAT-based networking behavior
+- The HTTP server test failed because port 8000 was already in use
+
+---
+
+## Limitations
+
+- TCP scanning only
+- No UDP support
+- Basic banner grabbing
+- No OS detection
+- Results depend on active services
+- WSL network isolation can affect visibility
+
+---
+
+## Comparison with Nmap
+
+| Feature | This Tool | Nmap |
+| --- | --- | --- |
+| Port scanning | Yes | Yes |
+| Service detection | Basic | Advanced |
+| Banner grabbing | Limited | Detailed |
+| OS detection | No | Yes |
+
+---
+
+## Learning Outcomes
+
+- Understanding TCP port scanning
+- Service identification
+- Banner grabbing techniques
+- WSL networking behavior
+- Differences between custom tools and professional tools
+
+---
+
+## Project Structure
+
+```text
+port-scanner-cybersecurity-lab/
+|-- README.md
+|-- LAB_REPORT.md
+|-- screenshots/
+|-- windows/
+|   |-- advanced_port_scanner.py
+|   |-- README.txt
+|   `-- results/
+`-- wsl/
+    |-- advanced_port_scanner.py
+    |-- README.txt
+    `-- results/
+```
+
+
+
+---
+
+## Disclaimer
+
+This project is for educational purposes only. Only scan systems you own or have permission to test.
+
+---
+
+

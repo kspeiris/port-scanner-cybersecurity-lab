@@ -318,26 +318,6 @@ Overall, the experiment provided practical understanding of network scanning tec
 
 ---
 
-## Suggested Screenshot File Names
-
-If you want to add images later, store them in a root `screenshots` folder with names such as:
-
-- `setup.png`
-- `install.png`
-- `code.png`
-- `ssh.png`
-- `http_error.png`
-- `localhost_scan.png`
-- `wsl_to_windows.png`
-- `windows_to_wsl.png`
-- `banner.png`
-- `nmap.png`
-
-Example embed:
-
-```markdown
-![Localhost Scan](screenshots/localhost_scan.png)
-```
 
 ---
 
