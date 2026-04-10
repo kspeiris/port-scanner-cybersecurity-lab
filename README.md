@@ -36,6 +36,58 @@ Built and tested in a Windows + WSL (Ubuntu 24.04.4 LTS) environment.
 
 ---
 
+## Lab Architecture
+
+```mermaid
+flowchart TD
+    U[User in VS Code] --> W1[Windows PowerShell]
+    U --> W2[WSL Ubuntu Terminal]
+
+    subgraph Project["Project: port-scanner-cybersecurity-lab"]
+        WR[windows/advanced_port_scanner.py]
+        LR[windows/results/*.json, *.csv]
+        XR[wsl/advanced_port_scanner.py]
+        XL[wsl/results/*.json, *.csv]
+        DOC[README.md / LAB_REPORT.md]
+        SS[screenshots/]
+    end
+
+    W1 --> WR
+    W2 --> XR
+
+    subgraph WindowsHost["Windows Host"]
+        WL[127.0.0.1 / Windows services]
+        WINIP[Windows IP<br/>172.23.176.1]
+        WHTTP[Optional Python HTTP Server :8080]
+    end
+
+    subgraph WSLHost["WSL Ubuntu"]
+        LLOCAL[127.0.0.1 / Linux services]
+        WSLIP[WSL IP<br/>172.23.180.180]
+        SSH[OpenSSH Server :22]
+        HTTP[Optional Python HTTP Server :8000]
+    end
+
+    WR -->|scan localhost| WL
+    XR -->|scan localhost| LLOCAL
+
+    XR -->|scan Windows| WINIP
+    WR -->|scan WSL| WSLIP
+
+    SSH --> WSLIP
+    HTTP --> WSLIP
+    WHTTP --> WINIP
+
+    WR -->|save output| LR
+    XR -->|save output| XL
+
+    LR --> DOC
+    XL --> DOC
+    SS --> DOC
+```
+
+---
+
 ## Installation
 
 ### 1. Clone or download the project
@@ -243,5 +295,4 @@ port-scanner-cybersecurity-lab/
 This project is for educational purposes only. Only scan systems you own or have permission to test.
 
 ---
-
 
