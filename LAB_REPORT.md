@@ -77,7 +77,7 @@ sudo apt install python3 openssh-server
 
 Screenshot 2: Package installation output
 
-![Screenshot 2](screenshots/Screenshot 2.png)
+![Screenshot 2](screenshots/Screenshot%202.png)
 
 ---
 
@@ -92,7 +92,7 @@ The Python scanner was developed in VS Code and implemented the following:
 
 Screenshot 3: Scanner code in VS Code
 
-![Screenshot 3](screenshots/Screenshot 3.png)
+![Screenshot 3](screenshots/Screenshot%203.png)
 
 ---
 
@@ -105,7 +105,7 @@ Screenshot 3: Scanner code in VS Code
 
 Screenshot 4: `sudo service ssh status`
 
-![Screenshot 4](screenshots/Screenshot 4.png)
+![Screenshot 4](screenshots/Screenshot%204.png)
 
 #### HTTP Server Attempt
 
@@ -125,7 +125,7 @@ This indicates that port 8000 was already occupied by another process.
 
 Screenshot 5: HTTP server error
 
-![Screenshot 5](screenshots/Screenshot 5.png)
+![Screenshot 5](screenshots/Screenshot%205.png)
 
 ---
 
@@ -142,7 +142,7 @@ Screenshot 5: HTTP server error
 
 Screenshot 6: Localhost scan output
 
-![Screenshot 6](screenshots/Screenshot 6.png)
+![Screenshot 6](screenshots/Screenshot%206.png)
 
 ---
 
@@ -158,7 +158,7 @@ Screenshot 6: Localhost scan output
 
 Screenshot 7: WSL to Windows scan output
 
-![Screenshot 7](screenshots/Screenshot 7.png)
+![Screenshot 7](screenshots/Screenshot%207.png)
 
 ---
 
@@ -171,7 +171,7 @@ This can occur when no WSL service is listening on externally reachable interfac
 
 Screenshot 8: Windows to WSL scan output
 
-![Screenshot 8](screenshots/Screenshot 8.png)
+![Screenshot 8](screenshots/Screenshot%208.png)
 
 ---
 
@@ -189,7 +189,7 @@ This localhost result shows that Windows could observe an SSH service exposed lo
 
 Screenshot 9: Windows localhost scan output
 
-![Screenshot 9](screenshots/Screenshot 9.png)
+![Screenshot 9](screenshots/Screenshot%209.png)
 
 ---
 
@@ -200,7 +200,7 @@ Screenshot 9: Windows localhost scan output
 
 Screenshot 10: HTTP test or port conflict evidence
 
-![Screenshot 10](screenshots/Screenshot 10.png)
+![Screenshot 10](screenshots/Screenshot%2010.png)
 
 ---
 
@@ -317,8 +317,6 @@ Overall, the experiment provided practical understanding of network scanning tec
 - Differences between a custom educational scanner and Nmap
 
 ---
-
-
 ---
 
 ## Disclaimer
